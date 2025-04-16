@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import './App.css';
 import WordManager from './WordManager';
-import FilterAndPractice from './FilterAndPractice';
+import FilterAndPractice from './Practice/FilterAndPractice';
+import WordList from './WordList';
+import Practice from './Practice';
+import { TabView, TabPanel } from 'primereact/tabview';
+import './App.css'
 
 type Word = {
   english: string;
@@ -17,7 +20,7 @@ const App: React.FC = () => {
   const [userInput, setUserInput] = useState('');
   const [score, setScore] = useState({ correct: 0, wrong: 0 });
   const [practiceWords, setPracticeWords] = useState<any[]>([]);
-  const [activeSection, setActiveSection] = useState<'addWord' | 'practice' | 'wordList' | 'profile'>('addWord');
+  const [activeSection, setActiveSection] = useState<'addWord' | 'practice' | 'wordList' | 'profile'>('practice');
 
   const fetchWords = () => {
     fetch('http://localhost:8080/getVocabularies')
@@ -56,66 +59,35 @@ const App: React.FC = () => {
 
   return (
     <div className="App">
-      <header className="App-header">
-        <h1>English Practice App</h1>
-        <nav className="App-nav">
-          <button onClick={() => setActiveSection('addWord')}>Add Word</button>
-          <button onClick={() => setActiveSection('practice')}>Practice</button>
-          <button onClick={() => setActiveSection('wordList')}>Word List</button>
-          <button onClick={() => setActiveSection('profile')}>Profile</button>
-        </nav>
-
-        <main className="App-main">
-          {activeSection === 'addWord' && <WordManager onWordAdded={fetchWords} />}
-
-          {activeSection === 'practice' && (
+      <h1 className='title'>English Practice App</h1>
+      <div>
+        <TabView>
+          <TabPanel header='Add Word'>
+            <WordManager onWordAdded={fetchWords} />
+          </TabPanel>
+          <TabPanel header='Practice'>
+            <Practice
+              practiceMode={practiceMode}
+              words={words}
+              startPractice={startPractice}
+              currentWord={currentWord}
+              userInput={userInput}
+              setUserInput={setUserInput}
+              handleAnswer={handleAnswer}
+              score={score}
+            />
+          </TabPanel>
+          <TabPanel header='Word List'>
+            <WordList words={words} />
+          </TabPanel>
+          <TabPanel header='Profile'>
             <div>
-              {!practiceMode && <FilterAndPractice words={words} onStartPractice={startPractice} />}
-
-              {practiceMode && currentWord && (
-                <div>
-                  <p>{currentWord.vietnamese}</p>
-                  <input
-                    type="text"
-                    value={userInput}
-                    onChange={(e) => setUserInput(e.target.value)}
-                    placeholder="Type your answer"
-                  />
-                  <button onClick={handleAnswer}>Submit</button>
-                </div>
-              )}
-
-              {!currentWord && practiceMode === null && (
-                <div>
-                  <h2>Practice Complete!</h2>
-                  <p>Correct: {score.correct}</p>
-                  <p>Wrong: {score.wrong}</p>
-                </div>
-              )}
-            </div>
-          )}
-
-          {activeSection === 'wordList' && (
-            <div>
-              <h2>Word List</h2>
-              <ul>
-                {words.map((word, index) => (
-                  <li key={index}>
-                    {word.english} - {word.vietnamese} ({word.tags.join(', ')})
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {activeSection === 'profile' && (
-            <div>
-              <h2>Profile</h2>
+              <h2 style={{paddingBottom: '20px'}}>Profile</h2>
               <p>Welcome to your profile!</p>
             </div>
-          )}
-        </main>
-      </header>
+          </TabPanel>
+        </TabView>
+      </div>
     </div>
   );
 };

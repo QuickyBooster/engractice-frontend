@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import { InputText } from 'primereact/inputtext';
+import { Button } from 'primereact/button';
+import './styles.css';
 
 const WordManager: React.FC<{ onWordAdded: () => void }> = ({ onWordAdded }) => {
   const [english, setEnglish] = useState('');
@@ -35,33 +38,35 @@ const WordManager: React.FC<{ onWordAdded: () => void }> = ({ onWordAdded }) => 
 
   return (
     <div>
-      <h2>Add New Word</h2>
-      <input
-        type="text"
-        placeholder="English"
-        value={english}
-        onChange={(e) => setEnglish(e.target.value)}
-      />
-      <input
-        type="text"
-        placeholder="Vietnamese"
-        value={vietnamese}
-        onChange={(e) => setVietnamese(e.target.value)}
-      />
-      <input
+      <h2 style={{paddingBottom: '20px'}}>Add New Word</h2>
+      <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '10px'}}>
+        <InputText
+          type="text"
+          placeholder="English"
+          value={english}
+          onChange={(e) => setEnglish(e.target.value)}
+        />
+        <InputText
+          type="text"
+          placeholder="Vietnamese"
+          value={vietnamese}
+          onChange={(e) => setVietnamese(e.target.value)}
+        />
+      </div>
+      <InputText
         type="text"
         placeholder="Audio Link"
         value={audioLink}
         onChange={(e) => setAudioLink(e.target.value)}
       />
-      <div>
-        <input
+      <div style={{margin: '10px 0'}}>
+        <InputText
           type="text"
           placeholder="Add Tag"
           value={tagInput}
           onChange={(e) => setTagInput(e.target.value)}
         />
-        <button onClick={addTag}>Add Tag</button>
+        <Button onClick={addTag} style={{marginLeft: '50px'}}>Add Tag</Button>
       </div>
       <div>
         {tags.map((tag, index) => (
@@ -70,7 +75,7 @@ const WordManager: React.FC<{ onWordAdded: () => void }> = ({ onWordAdded }) => 
           </span>
         ))}
       </div>
-      <button onClick={addWord}>Add Word</button>
+      <Button onClick={addWord}>Add Word</Button>
     </div>
   );
 };
