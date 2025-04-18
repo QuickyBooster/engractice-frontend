@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import WordManager from './WordManager';
-import FilterAndPractice from './Practice/FilterAndPractice';
 import WordList from './WordList';
 import Practice from './Practice';
 import { TabView, TabPanel } from 'primereact/tabview';
+import { PrimeIcons } from 'primereact/api';
 import './App.css'
 
 type Word = {
@@ -20,7 +20,6 @@ const App: React.FC = () => {
   const [userInput, setUserInput] = useState('');
   const [score, setScore] = useState({ correct: 0, wrong: 0 });
   const [practiceWords, setPracticeWords] = useState<any[]>([]);
-  const [activeSection, setActiveSection] = useState<'addWord' | 'practice' | 'wordList' | 'profile'>('practice');
 
   const fetchWords = () => {
     fetch('http://localhost:8080/getVocabularies')

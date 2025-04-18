@@ -3,8 +3,9 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { PrimeReactProvider } from 'primereact/api'
-import "primereact/resources/themes/lara-light-cyan/theme.css";
+import { PrimeReactProvider } from 'primereact/api';
+import "primereact/resources/themes/soho-light/theme.css";
+import 'primeicons/primeicons.css';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
