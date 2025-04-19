@@ -3,8 +3,7 @@ import WordManager from './WordManager';
 import WordList from './WordList';
 import Practice from './Practice';
 import { TabView, TabPanel } from 'primereact/tabview';
-import { PrimeIcons } from 'primereact/api';
-import './App.css'
+import './styles.css'
 
 type Word = {
   english: string;
