@@ -1,5 +1,9 @@
 import { FC } from "react";
 
+type Props = {
+  words: any[];
+}
+
 const WordList: FC<Props> = ({...props}) => {
   const { words } = props
 
@@ -16,9 +20,5 @@ const WordList: FC<Props> = ({...props}) => {
     </div>
   )
 };
-
-type Props = {
-  words: any[];
-}
 
 export default WordList;

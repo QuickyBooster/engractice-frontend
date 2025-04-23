@@ -3,8 +3,15 @@ import { Dropdown } from 'primereact/dropdown';
 import { Button } from 'primereact/button';
 import { InputNumber, InputNumberValueChangeEvent } from 'primereact/inputnumber';
 import './styles.css';
+
+type Props = {
+  words: any[];
+  onStartPractice: (filteredWords: any[]) => void;
+}
         
-const FilterAndPractice: React.FC<{ words: any[], onStartPractice: (filteredWords: any[]) => void }> = ({ words, onStartPractice }) => {
+const FilterAndPractice: React.FC<Props> = ({...props}) => {
+  const { words, onStartPractice } = props;
+
   const [selectedTag, setSelectedTag] = useState('');
   const [numWords, setNumWords] = useState(10);
 

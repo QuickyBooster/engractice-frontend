@@ -3,6 +3,17 @@ import FilterAndPractice from "./FilterAndPractice";
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 
+type Props = {
+  practiceMode?: 'vietnamese' | 'audio' | null;
+  words: any[];
+  startPractice: (item: any[]) => void;
+  currentWord: any;
+  userInput: string;
+  setUserInput: Function;
+  handleAnswer: () => void;
+  score: { correct: number, wrong: number };
+}
+
 const Practice: FC<Props> = ({...props}) => {
   const {
     practiceMode,
@@ -43,17 +54,6 @@ const Practice: FC<Props> = ({...props}) => {
       )}
     </div>
   )
-}
-
-type Props = {
-  practiceMode?: 'vietnamese' | 'audio' | null;
-  words: any[];
-  startPractice: (item: any[]) => void;
-  currentWord: any;
-  userInput: string;
-  setUserInput: Function;
-  handleAnswer: () => void;
-  score: { correct: number, wrong: number };
 }
 
 export default Practice

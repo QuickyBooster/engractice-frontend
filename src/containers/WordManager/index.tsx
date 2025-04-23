@@ -3,7 +3,13 @@ import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import './styles.css';
 
-const WordManager: React.FC<{ onWordAdded: () => void }> = ({ onWordAdded }) => {
+type Props = {
+  onWordAdded: () => void;
+}
+
+const WordManager: React.FC<Props> = ({...props}) => {
+  const { onWordAdded } = props;
+
   const [english, setEnglish] = useState('');
   const [vietnamese, setVietnamese] = useState('');
   const [audioLink, setAudioLink] = useState('');
