@@ -1,12 +1,11 @@
-import { FC } from "react";
-import FilterAndPractice from "./FilterAndPractice";
+import { FC, useState } from "react";
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 
+import FilterAndPractice from "./FilterAndPractice";
+
 type Props = {
-  practiceMode?: 'vietnamese' | 'audio' | null;
   words: any[];
-  startPractice: (item: any[]) => void;
   currentWord: any;
   userInput: string;
   setUserInput: Function;
@@ -16,15 +15,21 @@ type Props = {
 
 const Practice: FC<Props> = ({...props}) => {
   const {
-    practiceMode,
     words,
-    startPractice,
     currentWord,
     userInput,
     setUserInput,
     handleAnswer,
     score
   } = props
+
+  const [practiceMode, setPracticeMode] = useState<'translate' | 'listen' | null>(null);
+  const [practiceWords, setPracticeWords] = useState<any[]>([]);
+  
+  const startPractice = (filteredWords: any[]) => {
+    setPracticeMode('translate'); 
+    setPracticeWords(filteredWords);
+  };
 
   return (
     <div>

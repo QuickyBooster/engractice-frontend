@@ -1,38 +1,37 @@
 import React, { useState, useEffect } from 'react';
+import { TabView, TabPanel } from 'primereact/tabview';
+
 import WordManager from './WordManager';
 import WordList from './WordList';
 import Practice from './Practice';
-import { TabView, TabPanel } from 'primereact/tabview';
+
+import { VocabularyType } from '../api/types';
+import { getAllVocabulary } from '../api/vocabularyApi';
+
 import './styles.css'
 
-type Word = {
-  english: string;
-  vietnamese: string;
-  audioLink: string;
-  tags: string[];
-};
-
 const App: React.FC = () => {
-  const [words, setWords] = useState<Word[]>([]);
+  const [vocabularies, setVocabularies] = useState<VocabularyType[]>([]);
   const [practiceMode, setPracticeMode] = useState<'vietnamese' | 'audio' | null>(null);
   const [currentWord, setCurrentWord] = useState<any>(null);
   const [userInput, setUserInput] = useState('');
   const [score, setScore] = useState({ correct: 0, wrong: 0 });
   const [practiceWords, setPracticeWords] = useState<any[]>([]);
 
-  const fetchWords = () => {
-    fetch('http://localhost:8080/getVocabularies')
-      .then((res) => res.json())
-      .then((data) => setWords(data));
-  };
+  const fetchVocabulary = async () => {
+    try {
+      const vocabularyData = await getAllVocabulary();
+      setVocabularies(vocabularyData);
+    } catch (err) {
+      throw(err);
+    }
+  }
 
   useEffect(() => {
-    fetchWords();
-  }, []);
-
+    fetchVocabulary();
+  }, [vocabularies]);
+  
   const startPractice = (filteredWords: any[]) => {
-    setPracticeMode('vietnamese'); // Default to Vietnamese-to-English mode
-    setPracticeWords(filteredWords);
     setCurrentWord(filteredWords[0]);
     setScore({ correct: 0, wrong: 0 });
   };
@@ -61,13 +60,11 @@ const App: React.FC = () => {
       <div>
         <TabView>
           <TabPanel header='Add Word'>
-            <WordManager onWordAdded={fetchWords} />
+            <WordManager />
           </TabPanel>
           <TabPanel header='Practice'>
             <Practice
-              practiceMode={practiceMode}
-              words={words}
-              startPractice={startPractice}
+              words={vocabularies}
               currentWord={currentWord}
               userInput={userInput}
               setUserInput={setUserInput}
@@ -76,7 +73,7 @@ const App: React.FC = () => {
             />
           </TabPanel>
           <TabPanel header='Word List'>
-            <WordList words={words} />
+            <WordList words={vocabularies} />
           </TabPanel>
           <TabPanel header='Profile'>
             <div>

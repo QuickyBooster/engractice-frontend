@@ -15,7 +15,8 @@
 }
 
 .p-tabview-panels {
-  width: 450px;
   border-radius: 5px;
   margin: 0 auto;
+  min-width: 450px;
+  width: fit-content;
 }

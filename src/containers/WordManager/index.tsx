@@ -1,87 +1,135 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
+import { Toast } from 'primereact/toast';
+import { Tag } from 'primereact/tag';
+
+import { VocabularyPayload } from '../../api/types';
+import { uploadVocabulary } from '../../api/vocabularyApi';
+
 import './styles.css';
 
 type Props = {
-  onWordAdded: () => void;
+  // onWordAdded: () => void;
 }
 
 const WordManager: React.FC<Props> = ({...props}) => {
-  const { onWordAdded } = props;
+  // const { onWordAdded } = props;
 
-  const [english, setEnglish] = useState('');
-  const [vietnamese, setVietnamese] = useState('');
-  const [audioLink, setAudioLink] = useState('');
-  const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
+  const [vocabularyForm, setVocabularyForm] = useState<VocabularyPayload>({
+    english: '',
+    vietnamese: '',
+    tag: [],
+    mp3: '',
+  })
+  const toast = useRef<Toast>(null);
 
-  const addWord = () => {
-    const newWord = { english, vietnamese, audioLink, tags };
+  const showSuccess = () => {
+    toast?.current?.show({
+      severity:'success', 
+      summary: 'Success', 
+      detail:'Upload new word successfully!', 
+      life: 3000,
+    });
+  }
 
-    fetch('http://localhost:8080/addVocabulary', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newWord),
-    })
-      .then((res) => {
-        if (res.ok) {
-          onWordAdded();
-          setEnglish('');
-          setVietnamese('');
-          setAudioLink('');
-          setTags([]);
-        }
-      });
-  };
+  const showError = () => {
+    toast?.current?.show({
+      severity:'error', 
+      summary: 'Error', 
+      detail:'Upload new word unsuccessfully!', 
+      life: 3000
+    });
+  }
 
-  const addTag = () => {
-    if (tagInput && !tags.includes(tagInput)) {
-      setTags([...tags, tagInput]);
+  const handleAddTag = () => {
+    if (tagInput && !vocabularyForm.tag.includes(tagInput)) {
+      vocabularyForm.tag.push(tagInput);
       setTagInput('');
     }
   };
 
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+
+    setVocabularyForm({   
+      ...vocabularyForm,
+      [name]: value
+    })
+
+  }
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    try {
+      await uploadVocabulary(vocabularyForm);
+      showSuccess();
+      setVocabularyForm({
+        english: '',
+        vietnamese: '',
+        tag: [],
+        mp3: '',
+      });
+    } catch (err) {
+      showError();
+    }
+  };  
+
   return (
     <div>
+      <Toast ref={toast} />
       <h2 style={{paddingBottom: '20px'}}>Add New Word</h2>
-      <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '10px'}}>
+      <form id='vocabularyForm' onSubmit={handleSubmit}>
+        <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '10px'}}>
+          <InputText
+            required
+            type="text"
+            placeholder="English"
+            name='english'
+            value={vocabularyForm.english}
+            onChange={handleFormChange}
+          />
+          <InputText
+            required
+            type="text"
+            placeholder="Vietnamese"
+            name='vietnamese'
+            value={vocabularyForm.vietnamese}
+            onChange={handleFormChange}
+          />
+        </div>
         <InputText
+          style={{ width: '100%' }}
           type="text"
-          placeholder="English"
-          value={english}
-          onChange={(e) => setEnglish(e.target.value)}
+          placeholder="Audio Link"
+          name='mp3'
+          value={vocabularyForm.mp3}
+          onChange={handleFormChange}
         />
-        <InputText
-          type="text"
-          placeholder="Vietnamese"
-          value={vietnamese}
-          onChange={(e) => setVietnamese(e.target.value)}
-        />
-      </div>
-      <InputText
-        type="text"
-        placeholder="Audio Link"
-        value={audioLink}
-        onChange={(e) => setAudioLink(e.target.value)}
-      />
-      <div style={{margin: '10px 0'}}>
-        <InputText
-          type="text"
-          placeholder="Add Tag"
-          value={tagInput}
-          onChange={(e) => setTagInput(e.target.value)}
-        />
-        <Button onClick={addTag} style={{marginLeft: '50px'}}>Add Tag</Button>
-      </div>
-      <div>
-        {tags.map((tag, index) => (
-          <span key={index} style={{ marginRight: '5px' }}>
-            {tag}
-          </span>
-        ))}
-      </div>
-      <Button onClick={addWord}>Add Word</Button>
+        <div className='tag-container'>
+          <InputText
+            type="text"
+            placeholder="Add Tag"
+            name='tag'
+            value={tagInput}
+            onChange={(e) => setTagInput(e.target.value)}
+          />
+          <div onClick={handleAddTag} className='add-tag-btn'>Add Tag</div>
+        </div>
+        <div>
+          {vocabularyForm.tag.map((tag, index) => (
+            <Tag 
+              key={index} 
+              value={tag} 
+              severity='success'
+              style={{ marginRight: '8px' }} 
+            />
+          ))}
+        </div>
+      </form>
+      <Button type='submit' form='vocabularyForm' style={{ marginTop: '15px' }}>Add Word</Button>
     </div>
   );
 };

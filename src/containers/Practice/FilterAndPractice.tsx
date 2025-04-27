@@ -15,18 +15,17 @@ const FilterAndPractice: React.FC<Props> = ({...props}) => {
   const [selectedTag, setSelectedTag] = useState('');
   const [numWords, setNumWords] = useState(10);
 
-  const uniqueTags = Array.from(new Set(words.flatMap(word => word.tags)));
+  const uniqueTags = Array.from(new Set(words.flatMap(word => word.tag)));
   const selectOptions = [
     ...uniqueTags,
     { name: 'All', value: 'all'},
-    { name: 'Tag 1', value: 'tag1'},
   ]
 
   const handlePractice = () => {
     let filteredWords = words;
 
     if (selectedTag) {
-      filteredWords = words.filter(word => word.tags.includes(selectedTag));
+      filteredWords = words.filter(word => word.tag.includes(selectedTag));
     }
 
     filteredWords = filteredWords.slice(0, numWords);

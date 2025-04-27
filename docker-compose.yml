@@ -1,0 +1,26 @@
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
+    ports:
+      - 27017:27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=1234
+      - MONGO_INITDB_DATABASE=english
+  app:
+    image: quickybooster/engractice:latest
+    container_name: engractice
+    restart: always
+    ports:
+      - 8080:8080
+    environment:
+      - NODE_ENV=production
+      - PORT=8080
+      - APP_ENV=local
+      - BLUEPRINT_DB_HOST=mongodb
+      - BLUEPRINT_DB_PORT=27017
+      - BLUEPRINT_DB_USERNAME=admin
+      - BLUEPRINT_DB_ROOT_PASSWORD=1234
+      - BLUEPRINT_DB_DATABASE=english

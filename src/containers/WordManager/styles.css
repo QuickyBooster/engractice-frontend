@@ -1,7 +1,33 @@
-.p-inputtext {
-  max-width: 200px;
-}
-
 .p-button .add-btn {
   margin-left: auto;
+}
+
+.p-toast-message-icon {
+  margin-right: 15px;
+  width: 26px;
+  height: 26px;
+}
+
+.p-toast-message-content {
+  display: flex;
+  align-items: center;
+}
+
+.tag-container {
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+}
+
+.add-tag-btn {
+  background-color: #7254f3;
+  border-radius: 6px;
+  color: #fff;
+  padding: 10px 30px;
+  margin-left: 50px;
+  cursor: pointer;
+}
+
+.add-tag-btn:hover {
+  background-color: #6545f2;
 }
