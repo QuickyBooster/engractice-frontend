@@ -12,11 +12,6 @@ import './styles.css'
 
 const App: React.FC = () => {
   const [vocabularies, setVocabularies] = useState<VocabularyType[]>([]);
-  const [practiceMode, setPracticeMode] = useState<'vietnamese' | 'audio' | null>(null);
-  const [currentWord, setCurrentWord] = useState<any>(null);
-  const [userInput, setUserInput] = useState('');
-  const [score, setScore] = useState({ correct: 0, wrong: 0 });
-  const [practiceWords, setPracticeWords] = useState<any[]>([]);
 
   const fetchVocabulary = async () => {
     try {
@@ -29,30 +24,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     fetchVocabulary();
-  }, [vocabularies]);
-  
-  const startPractice = (filteredWords: any[]) => {
-    setCurrentWord(filteredWords[0]);
-    setScore({ correct: 0, wrong: 0 });
-  };
-
-  const handleAnswer = () => {
-    if (!currentWord) return;
-
-    if (userInput.toLowerCase() === currentWord.english.toLowerCase()) {
-      setScore((prev) => ({ ...prev, correct: prev.correct + 1 }));
-    } else {
-      setScore((prev) => ({ ...prev, wrong: prev.wrong + 1 }));
-    }
-
-    const nextIndex = practiceWords.indexOf(currentWord) + 1;
-    if (nextIndex < practiceWords.length) {
-      setCurrentWord(practiceWords[nextIndex]);
-    } else {
-      setPracticeMode(null);
-    }
-    setUserInput('');
-  };
+  }, []);
 
   return (
     <div className="App">
@@ -63,14 +35,7 @@ const App: React.FC = () => {
             <WordManager />
           </TabPanel>
           <TabPanel header='Practice'>
-            <Practice
-              words={vocabularies}
-              currentWord={currentWord}
-              userInput={userInput}
-              setUserInput={setUserInput}
-              handleAnswer={handleAnswer}
-              score={score}
-            />
+            <Practice words={vocabularies} />
           </TabPanel>
           <TabPanel header='Word List'>
             <WordList words={vocabularies} />

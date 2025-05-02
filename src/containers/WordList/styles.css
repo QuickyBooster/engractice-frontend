@@ -1,3 +1,7 @@
 .p-sortable-column-icon {
   margin-left: 5px;
 }
+
+.p-tag.p-tag-info {
+  margin-right: 10px;
+}

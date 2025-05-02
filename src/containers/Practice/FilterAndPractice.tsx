@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Dropdown } from 'primereact/dropdown';
 import { Button } from 'primereact/button';
 import { InputNumber, InputNumberValueChangeEvent } from 'primereact/inputnumber';
@@ -14,11 +14,12 @@ const FilterAndPractice: React.FC<Props> = ({...props}) => {
 
   const [selectedTag, setSelectedTag] = useState('');
   const [numWords, setNumWords] = useState(10);
+  const [isDisabled, setIsDisabled] = useState<boolean>(true);
 
   const uniqueTags = Array.from(new Set(words.flatMap(word => word.tag)));
   const selectOptions = [
     ...uniqueTags,
-    { name: 'All', value: 'all'},
+    { name: 'all', value: 'all'},
   ]
 
   const handlePractice = () => {
@@ -31,6 +32,14 @@ const FilterAndPractice: React.FC<Props> = ({...props}) => {
     filteredWords = filteredWords.slice(0, numWords);
     onStartPractice(filteredWords);
   };
+
+  useEffect(() => {
+    if (selectedTag !== '') {
+      setIsDisabled(false);
+    }
+  }, [selectedTag])
+
+
   return (
     <div style={{marginBottom: '15px'}}>
       <h2 style={{paddingBottom: '20px'}}>Filter and Practice</h2>
@@ -53,7 +62,7 @@ const FilterAndPractice: React.FC<Props> = ({...props}) => {
           max={words.length || 100}
         />
       </div>
-      <Button onClick={handlePractice}>Start Practice</Button>
+      <Button onClick={handlePractice} disabled={isDisabled}>Start Practice</Button>
     </div>
   );
 };

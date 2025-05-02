@@ -1,7 +1,7 @@
-import { FC, useEffect, useState } from "react";
-import { DataTable } from 'primereact/datatable';
-import { Column } from 'primereact/column';
+import { FC, useMemo } from "react";
 import { Tag } from 'primereact/tag';
+import { Table } from "antd";
+import type { TableProps } from "antd";
 
 import { VocabularyType } from "../../api/types";
 
@@ -14,41 +14,44 @@ type Props = {
 const WordList: FC<Props> = ({...props}) => {
   const { words } = props;
 
-  const [formatWords, setFormatWords] = useState<any[]>([]);
-
-  const handleFormatWords = () => {
-    let cloneWords: any = [];
-    words?.forEach((item) => {
-      cloneWords.push({
-        english: item.english,
-        vietnamese: item.vietnamese,
-        tag: item.tag.join(' / '),
-        mp3: item.mp3,
-      });
-    }); 
-    setFormatWords(cloneWords);
-  };
- 
-  useEffect(() => {
-    handleFormatWords();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [words])
+  const columns = useMemo<TableProps<VocabularyType>['columns']>(() => [
+    {
+      title: 'English',
+      dataIndex: 'english',
+      key: 'english',
+    },
+    {
+      title: 'Vietnamese',
+      dataIndex: 'vietnamese',
+      key: 'vietnamese',
+    },
+    {
+      title: 'Audio Link',
+      dataIndex: 'mp3',
+      key: 'mp3',
+    },
+    {
+      title: 'Tags',
+      dataIndex: 'tag',
+      key: 'tag',
+      render: (_, { tag }) => (
+        <>
+          {tag?.map((item, index) => (
+            <Tag key={index} severity='info' value={item.toUpperCase()} />
+          ))}
+        </>
+      )
+    },
+  ], []);
 
   return (
     <div style={{width: '1000px'}}>
       <h2 style={{paddingBottom: '20px', textAlign: 'center'}}>Word List</h2>
-      <DataTable
-        value={formatWords}
-        stripedRows
-        scrollable 
-        scrollHeight="500px"
-        emptyMessage='No Data Found!'
-      >
-       <Column field="english" sortable header="English" />
-        <Column field="vietnamese" header="Vietnamese" />
-        <Column field="mp3" header="Audio Link" />
-        <Column field="tag" header="Tags" />
-      </DataTable>
+      <Table<VocabularyType> 
+        columns={columns}
+        dataSource={words} 
+        scroll={{ y: 300 }}
+      />
     </div>
   )
 };
