@@ -1,24 +1,104 @@
-import { FC, useMemo } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import { FC, useEffect, useMemo, useRef, useState } from "react";
 import { Tag } from 'primereact/tag';
-import { Table } from "antd";
-import type { TableProps } from "antd";
+import { Button, Input, Space, Table } from "antd";
+import type { TableProps, InputRef, TableColumnType } from "antd";
+import type { FilterDropdownProps } from "antd/es/table/interface";
 
 import { VocabularyType } from "../../api/types";
+import { getAllVocabulary } from "../../api/vocabularyApi";
 
 import './styles.css';
 
-type Props = {
-  words: VocabularyType[];
-}
+type DataIndex = keyof VocabularyType;
 
-const WordList: FC<Props> = ({...props}) => {
-  const { words } = props;
+const WordList: FC = () => {
+  const [vocabularies, setVocabularies] = useState<VocabularyType[]>([]);
+  const searchInput = useRef<InputRef>(null);
+
+  const fetchVocabulary = async () => {
+    try {
+      const vocabularyData = await getAllVocabulary();
+      setVocabularies(vocabularyData);
+    } catch (err) {
+      throw(err);
+    }
+  }
+
+  useEffect(() => {
+    fetchVocabulary();
+  }, []);
+
+  const handleSearch = (confirm: FilterDropdownProps['confirm']) => {
+    confirm();
+  };
+
+  const handleReset = (clearFilter: () => void) => {
+    clearFilter();
+  }
+
+  const getColumnSearchProps = (dataIndex: DataIndex): TableColumnType<VocabularyType> => ({
+    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
+      <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
+        <Input
+          ref={searchInput}
+          placeholder={`Search ${dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+          onPressEnter={() => handleSearch(confirm)}
+          style={{ marginBottom: 8, display: 'block' }}
+        />
+        <Space>
+          <Button
+            type="primary"
+            onClick={() => handleSearch(confirm)}
+            icon={<i className="pi pi-search"></i>}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Search
+          </Button>
+          <Button
+            onClick={() => clearFilters && handleReset(clearFilters)}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Reset
+          </Button>
+          <Button
+            type="link"
+            size="small"
+            onClick={() => close()}
+          >
+            Close
+          </Button>
+        </Space>
+      </div>
+    ),  
+    filterIcon: (filtered: boolean) => (
+      <i className="pi pi-search" style={{ color: filtered ? '#1677ff' : undefined }}></i>
+    ),
+    onFilter: (value, record) => 
+      record[dataIndex]
+        .toString()
+        .toLowerCase()
+        .includes((value as string).toLowerCase()),
+      filterDropdownProps: {
+        onOpenChange(open) {
+          if (open) {
+            setTimeout(() => searchInput.current?.select(), 100);
+          }
+        },
+      },
+    render: (text) => text,
+  });
 
   const columns = useMemo<TableProps<VocabularyType>['columns']>(() => [
     {
       title: 'English',
       dataIndex: 'english',
       key: 'english',
+      ...getColumnSearchProps('english'),
     },
     {
       title: 'Vietnamese',
@@ -49,8 +129,8 @@ const WordList: FC<Props> = ({...props}) => {
       <h2 style={{paddingBottom: '20px', textAlign: 'center'}}>Word List</h2>
       <Table<VocabularyType> 
         columns={columns}
-        dataSource={words} 
-        scroll={{ y: 300 }}
+        dataSource={vocabularies} 
+        scroll={{ y: 450 }}
       />
     </div>
   )

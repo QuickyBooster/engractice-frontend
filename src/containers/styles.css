@@ -1,6 +1,13 @@
 .App {
   min-height: 100vh;
   padding-top: 60px;
+  padding-bottom: 60px;
+}
+
+.app-container {
+  background: #00d2ff;
+  background: -webkit-linear-gradient(to right, #928DAB, #00d2ff);
+  background: linear-gradient(to right, #928DAB, #00d2ff);
 }
 
 .title {
@@ -12,6 +19,16 @@
   justify-content: center;
   border: none;
   margin-bottom: 10px;
+  background-color: transparent;
+}
+
+.p-tabview-nav-link {
+  background-color: transparent;
+  color: #000;
+}
+
+.p-tabview-selected > a {
+  color: #7254f3;
 }
 
 .p-tabview-panels {
@@ -19,4 +36,5 @@
   margin: 0 auto;
   min-width: 450px;
   width: fit-content;
+  margin-top: 15px;
 }

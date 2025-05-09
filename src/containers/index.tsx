@@ -27,7 +27,7 @@ const App: React.FC = () => {
   }, []);
 
   return (
-    <div className="App">
+    <div className="App app-container">
       <h1 className='title'>English Practice App</h1>
       <div>
         <TabView>
@@ -38,7 +38,7 @@ const App: React.FC = () => {
             <Practice words={vocabularies} />
           </TabPanel>
           <TabPanel header='Word List'>
-            <WordList words={vocabularies} />
+            <WordList />
           </TabPanel>
           <TabPanel header='Profile'>
             <div>
