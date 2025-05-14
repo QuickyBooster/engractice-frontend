@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { FC, useEffect, useMemo, useRef, useState } from "react";
 import { Tag } from 'primereact/tag';
+import { SearchOutlined } from '@ant-design/icons';
 import { Button, Input, Space, Table } from "antd";
 import type { TableProps, InputRef, TableColumnType } from "antd";
 import type { FilterDropdownProps } from "antd/es/table/interface";
@@ -52,7 +53,7 @@ const WordList: FC = () => {
           <Button
             type="primary"
             onClick={() => handleSearch(confirm)}
-            icon={<i className="pi pi-search"></i>}
+            icon={<SearchOutlined style={{width: '16px'}} />}
             size="small"
             style={{ width: 90 }}
           >
@@ -76,7 +77,7 @@ const WordList: FC = () => {
       </div>
     ),  
     filterIcon: (filtered: boolean) => (
-      <i className="pi pi-search" style={{ color: filtered ? '#1677ff' : undefined }}></i>
+      <SearchOutlined style={{ color: filtered ? '#1677ff' : undefined }}/>
     ),
     onFilter: (value, record) => 
       record[dataIndex]

@@ -3,20 +3,16 @@ import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { Tag } from 'primereact/tag';
+import { CloseCircleOutlined } from '@ant-design/icons';
 
 import { VocabularyPayload } from '../../api/types';
 import { uploadVocabulary } from '../../api/vocabularyApi';
 
 import './styles.css';
 
-type Props = {
-  // onWordAdded: () => void;
-}
-
-const WordManager: React.FC<Props> = ({...props}) => {
-  // const { onWordAdded } = props;
-
-  const [tagInput, setTagInput] = useState('');
+const WordManager: React.FC = () => {
+  const [tagInput, setTagInput] = useState<string>('');
+  const [listTags, setListTags] = useState<string[]>([])
   const [vocabularyForm, setVocabularyForm] = useState<VocabularyPayload>({
     english: '',
     vietnamese: '',
@@ -44,10 +40,14 @@ const WordManager: React.FC<Props> = ({...props}) => {
   }
 
   const handleAddTag = () => {
-    if (tagInput && !vocabularyForm.tag.includes(tagInput)) {
-      vocabularyForm.tag.push(tagInput);
+    if (tagInput && !listTags.includes(tagInput)) {
+      setListTags(prevTags => [...prevTags, tagInput.trim()]);
       setTagInput('');
     }
+  };
+
+  const handleRemoveTag = (tagIndex: number) => {
+    setListTags(prevTags => prevTags.filter((_, index) => index !== tagIndex));
   };
 
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,8 +63,10 @@ const WordManager: React.FC<Props> = ({...props}) => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    const payload = { ...vocabularyForm, tag: listTags };
+
     try {
-      await uploadVocabulary(vocabularyForm);
+      await uploadVocabulary(payload);
       showSuccess();
       setVocabularyForm({
         english: '',
@@ -72,64 +74,77 @@ const WordManager: React.FC<Props> = ({...props}) => {
         tag: [],
         mp3: '',
       });
+      setListTags([]);
     } catch (err) {
       showError();
     }
   };  
 
   return (
-    <div>
+    <div style={{width: '800px'}}>
       <Toast ref={toast} />
-      <h2 style={{paddingBottom: '20px'}}>Add New Word</h2>
+      <h2 style={{paddingBottom: '20px', textAlign: 'center'}}>Add New Word</h2>
       <form id='vocabularyForm' onSubmit={handleSubmit}>
-        <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '10px'}}>
+        <div className='input-container'>
+          <label htmlFor="english">English</label>
           <InputText
+            id='english'
             required
-            type="text"
-            placeholder="English"
             name='english'
             value={vocabularyForm.english}
             onChange={handleFormChange}
           />
+        </div>
+        <div className='input-container'>
+          <label htmlFor="vietnamese">Vietnamese</label>
           <InputText
+            id='vietnamese'
             required
-            type="text"
-            placeholder="Vietnamese"
             name='vietnamese'
             value={vocabularyForm.vietnamese}
             onChange={handleFormChange}
           />
         </div>
-        <InputText
-          style={{ width: '100%' }}
-          type="text"
-          placeholder="Audio Link"
-          name='mp3'
-          value={vocabularyForm.mp3}
-          onChange={handleFormChange}
-        />
-        <div className='tag-container'>
+        <div className='input-container'>
+          <label htmlFor="mp3">Audio Link</label>
           <InputText
-            type="text"
-            placeholder="Add Tag"
-            name='tag'
-            value={tagInput}
-            onChange={(e) => setTagInput(e.target.value)}
+            id='mp3'
+            required
+            name='mp3'
+            value={vocabularyForm.mp3}
+            onChange={handleFormChange}
           />
-          <div onClick={handleAddTag} className='add-tag-btn'>Add Tag</div>
         </div>
-        <div>
-          {vocabularyForm.tag.map((tag, index) => (
+        <div className='input-container'>
+          <label htmlFor="mp3">Add Tags</label>
+          <div className='tag-container'>
+            <InputText
+              id='tag'
+              name='tag'
+              value={tagInput}
+              onChange={(e) => setTagInput(e.target.value)}
+              style={{marginBottom: 0, width: '250px'}}
+            />
+            <div onClick={handleAddTag} className='add-tag-btn'>Add Tag</div>
+          </div>
+        </div>
+        <div style={{marginTop: '10px', display:'flex'}}>
+          {listTags.map((tag, index) => (
             <Tag 
               key={index} 
-              value={tag} 
               severity='success'
-              style={{ marginRight: '8px' }} 
-            />
+              style={{marginRight: '8px', fontSize: '14px'}} 
+            >
+              {tag}
+              <CloseCircleOutlined 
+                style={{marginLeft: '10px', cursor: 'pointer'}} 
+                onClick={() => handleRemoveTag(index)}
+              />
+            </Tag>
           ))}
         </div>
       </form>
-      <Button type='submit' form='vocabularyForm' style={{ marginTop: '15px' }}>Add Word</Button>
+      <Button className='submit-btn' type='submit' form='vocabularyForm'>Add Word</Button>
     </div>
   );
 };
