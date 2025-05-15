@@ -32,3 +32,31 @@ export const uploadVocabulary = async (payload: VocabularyPayload) => {
     throw err;
   }
 }
+
+export const updateVocabulary = async (payload: VocabularyPayload, id: string) => {
+  try {
+    await axios.put(
+      `${BASE_URl_API}${CONFIG_API}${API_ROUTES.vocabulary}/${id}`,
+      payload,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        }
+      }
+    )
+
+  } catch (err) {
+    throw err;
+  } 
+}
+
+export const deleteVocabulary = async (id: string) => {
+  try {
+    await axios.delete(
+      `${BASE_URl_API}${CONFIG_API}${API_ROUTES.vocabulary}/${id}`,
+    )
+    
+  } catch (err) {
+    throw err;
+  }
+}

@@ -1,34 +1,31 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { FC, useEffect, useMemo, useRef, useState } from "react";
+import React, { FC, useMemo, useRef, useState } from "react";
 import { Tag } from 'primereact/tag';
-import { SearchOutlined } from '@ant-design/icons';
+import { Toast } from "primereact/toast";
+import { ConfirmDialog, confirmDialog, ConfirmDialogReturn } from 'primereact/confirmdialog';
+import { DeleteFilled, EditFilled, SearchOutlined, WarningFilled } from '@ant-design/icons';
 import { Button, Input, Space, Table } from "antd";
 import type { TableProps, InputRef, TableColumnType } from "antd";
 import type { FilterDropdownProps } from "antd/es/table/interface";
 
 import { VocabularyType } from "../../api/types";
-import { getAllVocabulary } from "../../api/vocabularyApi";
+import { deleteVocabulary } from "../../api/vocabularyApi";
+import { showSuccess, showError } from "../../utils/toastMessage";
+import EditModal from "./EditModal";
 
 import './styles.css';
 
 type DataIndex = keyof VocabularyType;
 
-const WordList: FC = () => {
-  const [vocabularies, setVocabularies] = useState<VocabularyType[]>([]);
+type Props = {
+  words: VocabularyType[];
+  handleInvalidateVocabulary: () => Promise<void>;
+};
+
+const WordList: FC<Props> = ({ words, handleInvalidateVocabulary }) => {
   const searchInput = useRef<InputRef>(null);
-
-  const fetchVocabulary = async () => {
-    try {
-      const vocabularyData = await getAllVocabulary();
-      setVocabularies(vocabularyData);
-    } catch (err) {
-      throw(err);
-    }
-  }
-
-  useEffect(() => {
-    fetchVocabulary();
-  }, []);
+  const toast = useRef<Toast>(null);  
+  const dialogRef = useRef<ConfirmDialogReturn>(null);
 
   const handleSearch = (confirm: FilterDropdownProps['confirm']) => {
     confirm();
@@ -36,7 +33,43 @@ const WordList: FC = () => {
 
   const handleReset = (clearFilter: () => void) => {
     clearFilter();
-  }
+  };
+
+  const handleDeleteWord = async (wordId: string) => {
+    try {
+      await deleteVocabulary(wordId);
+      showSuccess(toast, 'Delete vocabulary successfully!');
+      handleInvalidateVocabulary();
+    } catch (err) {
+      showError(toast, 'Delete vocabulary unsuccessfully!');
+    }
+  };
+
+  const showEditModal = (item: VocabularyType) => {
+    dialogRef.current = confirmDialog({
+      group: 'edit',
+      header: 'Edit Vocabulary',
+      message: (
+        <EditModal 
+          vocabulary={item} 
+          reFetch={handleInvalidateVocabulary}
+        />
+      ),
+    });
+  };
+
+  const showDeleteDialog = (wordId: string) => {
+    confirmDialog({
+      group: 'delete',
+      header: 'Delete Confirmation',
+      message: 'Please confirm before delete this vocabulary!',
+      icon: <WarningFilled style={{width: '24px', height: '24px'}} />,
+      acceptLabel: 'Delete',
+      rejectLabel: 'Cancel',
+      style: { width: '450px' },
+      accept: () => handleDeleteWord(wordId),
+    });
+  };
 
   const getColumnSearchProps = (dataIndex: DataIndex): TableColumnType<VocabularyType> => ({
     filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
@@ -99,17 +132,20 @@ const WordList: FC = () => {
       title: 'English',
       dataIndex: 'english',
       key: 'english',
+      width: 160,
       ...getColumnSearchProps('english'),
     },
     {
       title: 'Vietnamese',
       dataIndex: 'vietnamese',
       key: 'vietnamese',
+      width: 220,
     },
     {
       title: 'Audio Link',
       dataIndex: 'mp3',
       key: 'mp3',
+      width: 180,
     },
     {
       title: 'Tags',
@@ -123,14 +159,36 @@ const WordList: FC = () => {
         </>
       )
     },
+    {
+      title: 'Actions',
+      dataIndex: '',
+      key: 'x',
+      width: 80,
+      align: 'center',
+      render: (_, record) => (
+        <>
+          <EditFilled 
+            style={{cursor: 'pointer', color: '#2ac52a'}} 
+            onClick={() => showEditModal(record)}
+          />
+          <DeleteFilled
+            style={{cursor: 'pointer', color: '#ff4545', marginLeft: '10px'}} 
+            onClick={() => showDeleteDialog(record.id)}
+          />
+        </>
+      ),
+    },
   ], []);
 
   return (
     <div style={{width: '1000px'}}>
+      <Toast ref={toast} />
+      <ConfirmDialog group="edit" className="edit-modal" />
+      <ConfirmDialog group="delete" />
       <h2 style={{paddingBottom: '20px', textAlign: 'center'}}>Word List</h2>
       <Table<VocabularyType> 
         columns={columns}
-        dataSource={vocabularies} 
+        dataSource={words} 
         scroll={{ y: 450 }}
       />
     </div>

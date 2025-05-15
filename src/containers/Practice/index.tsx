@@ -2,10 +2,11 @@ import { FC, useState } from "react";
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 
+import { VocabularyType } from "../../api/types";
 import FilterAndPractice from "./FilterAndPractice";
 
 type Props = {
-  words: any[];
+  words: VocabularyType[];
 }
 
 const Practice: FC<Props> = ({...props}) => {

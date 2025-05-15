@@ -1,24 +1,30 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, FC } from 'react';
 import { InputText } from 'primereact/inputtext';
-import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { Tag } from 'primereact/tag';
+import { Button } from 'primereact/button';
 import { CloseCircleOutlined } from '@ant-design/icons';
 
 import { VocabularyPayload } from '../../api/types';
-import { uploadVocabulary } from '../../api/vocabularyApi';
+import { VocabularyType } from '../../api/types';
+import { updateVocabulary } from '../../api/vocabularyApi';
 import { showSuccess, showError } from '../../utils/toastMessage';
 
 import './styles.css';
 
-const WordManager: React.FC = () => {
+type Props = {
+  vocabulary: VocabularyType;
+  reFetch: () => Promise<void>;
+};
+
+const EditModal: FC<Props> = ({ vocabulary, reFetch }) => {
   const [tagInput, setTagInput] = useState<string>('');
-  const [listTags, setListTags] = useState<string[]>([])
+  const [listTags, setListTags] = useState<string[]>(vocabulary.tag)
   const [vocabularyForm, setVocabularyForm] = useState<VocabularyPayload>({
-    english: '',
-    vietnamese: '',
-    tag: [],
-    mp3: '',
+    english: vocabulary.english,
+    vietnamese: vocabulary.vietnamese,
+    tag: vocabulary.tag,
+    mp3: vocabulary.mp3,
   })
   const toast = useRef<Toast>(null);
 
@@ -49,24 +55,17 @@ const WordManager: React.FC = () => {
     const payload = { ...vocabularyForm, tag: listTags };
 
     try {
-      await uploadVocabulary(payload);
+      await updateVocabulary(payload, vocabulary.id);
       showSuccess(toast);
-      setVocabularyForm({
-        english: '',
-        vietnamese: '',
-        tag: [],
-        mp3: '',
-      });
-      setListTags([]);
+      reFetch();
     } catch (err) {
       showError(toast);
     }
   };  
 
   return (
-    <div style={{width: '800px'}}>
+    <div style={{width: '600px', marginLeft: '-10px'}}>
       <Toast ref={toast} />
-      <h2 style={{paddingBottom: '20px', textAlign: 'center'}}>Add New Word</h2>
       <form id='vocabularyForm' onSubmit={handleSubmit}>
         <div className='input-container'>
           <label htmlFor="english">English</label>
@@ -127,9 +126,9 @@ const WordManager: React.FC = () => {
           ))}
         </div>
       </form>
-      <Button className='submit-btn' type='submit' form='vocabularyForm'>Add Word</Button>
+      <Button type='submit' form='vocabularyForm' className='submit-btn'>Save</Button>
     </div>
   );
 };
 
-export default WordManager;
+export default EditModal;

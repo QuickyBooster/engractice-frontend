@@ -38,7 +38,7 @@ const App: React.FC = () => {
             <Practice words={vocabularies} />
           </TabPanel>
           <TabPanel header='Word List'>
-            <WordList />
+            <WordList words={vocabularies} handleInvalidateVocabulary={fetchVocabulary} />
           </TabPanel>
           <TabPanel header='Profile'>
             <div>

@@ -38,3 +38,18 @@
   width: fit-content;
   margin-top: 15px;
 }
+
+.p-toast-message-icon {
+  margin-right: 15px;
+  width: 26px;
+  height: 26px;
+}
+
+.p-toast-message-content {
+  display: flex;
+  align-items: center;
+}
+
+.p-toast-detail {
+  margin-top: 5px;
+}
