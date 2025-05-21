@@ -41,19 +41,20 @@ const FilterAndPractice: React.FC<Props> = ({...props}) => {
 
 
   return (
-    <div style={{marginBottom: '15px'}}>
-      <h2 style={{paddingBottom: '20px'}}>Filter and Practice</h2>
-      <div style={{marginBottom: '15px'}}>
-        <span>Tag:</span>
+    <div>
+      <h2 style={{paddingBottom: '20px', textAlign: 'center'}}>Filter and Practice</h2>
+      <div className='practice_input-container'>
+        <span>Tag</span>
         <Dropdown 
+          id='tag'
           value={selectedTag}
           options={selectOptions}
           optionLabel='name'
           onChange={(e) => setSelectedTag(e.target.value)}
         />
       </div>
-      <div style={{marginBottom: '15px'}}>
-        <span>Number of Words:</span>
+      <div className='practice_input-container'>
+        <span>Number of Words</span>
         <InputNumber
           value={numWords}
           onValueChange={(e: InputNumberValueChangeEvent) => setNumWords(Number(e.value))}
@@ -62,7 +63,7 @@ const FilterAndPractice: React.FC<Props> = ({...props}) => {
           max={words.length || 100}
         />
       </div>
-      <Button onClick={handlePractice} disabled={isDisabled}>Start Practice</Button>
+      <Button onClick={handlePractice} disabled={isDisabled} className='start-btn'>Start Practice</Button>
     </div>
   );
 };

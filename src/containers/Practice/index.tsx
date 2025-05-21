@@ -1,6 +1,9 @@
-import { FC, useState } from "react";
+import { FC, useRef, useState } from "react";
 import { InputText } from 'primereact/inputtext';
+import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
+import { CheckCircleFilled, CloseCircleFilled } from "@ant-design/icons";
 import { Button } from 'primereact/button';
+import { Chip } from 'primereact/chip';
 
 import { VocabularyType } from "../../api/types";
 import FilterAndPractice from "./FilterAndPractice";
@@ -21,6 +24,7 @@ const Practice: FC<Props> = ({...props}) => {
   });
   const [currentWord, setCurrentWord] = useState<any>(null);
   const [userAnswer, setUserAnswer] = useState('');
+  const answerRef = useRef<HTMLInputElement>(null);
   
   const startPractice = (filteredWords: any[]) => {
     setIsPractice(true); 
@@ -31,24 +35,24 @@ const Practice: FC<Props> = ({...props}) => {
   const handleAnswer = () => {
     if (!currentWord) return;
 
-    if (userAnswer.toLowerCase() === currentWord.english.toLowerCase()) {
-      setScore((prev) => ({ ...prev, correct: prev.correct + 1 }));
-    } else {
-      setScore((prev) => ({ ...prev, wrong: prev.wrong + 1 }));
-    }
+    const isCorrect = userAnswer.toLowerCase() === currentWord.english.toLowerCase();
+    const updatedScore = {
+      correct: score.correct + (isCorrect ? 1 : 0),
+      wrong: score.wrong + (isCorrect ? 0 : 1),
+    };
 
     const nextIndex = practiceWords.indexOf(currentWord) + 1;
+
     if (nextIndex < practiceWords.length) {
+      setScore(updatedScore);
       setCurrentWord(practiceWords[nextIndex]);
     } else {
-      setIsPractice(false);
-      setScore({ 
-        correct: 0, 
-        wrong: 0, 
-      });
+      setScore(updatedScore);
+      showResultModal(updatedScore);
     }
 
     setUserAnswer('');
+    answerRef?.current?.focus();
   };
 
   const handleCancel = () => {
@@ -57,41 +61,70 @@ const Practice: FC<Props> = ({...props}) => {
       correct: 0, 
       wrong: 0, 
     });
-  }
+  };
+
+  const showResultModal = (finalScore: { correct: number, wrong: number }) => {
+    confirmDialog({
+      group: 'result',
+      header: 'Practice Complete!',
+      message: (
+        <div className="result-wrapper">
+          <div className="result-item">
+            <CheckCircleFilled />
+            <p className="result-text">{finalScore.correct}</p>
+          </div>
+          <div className="result-item">
+            <CloseCircleFilled />
+            <p className="result-text">{finalScore.wrong}</p>
+          </div>
+        </div>
+      ),
+      style: { width: '400px' },
+      acceptLabel: 'Done',
+      accept: () => {
+        setIsPractice(false);
+        setScore({ 
+          correct: 0, 
+          wrong: 0, 
+        });
+      },
+      rejectClassName: 'reject-btn-practice'
+    });
+  };
 
   return (
-    <div>
+    <div style={{width: '500px'}}>
+      <ConfirmDialog group="result" className="result-dialog" />
+
       {!isPractice && <FilterAndPractice words={words} onStartPractice={startPractice} />}
 
       {isPractice && currentWord && (
         <div>
-          <div style={{ marginBottom: '20px' }}>
-            <span style={{ marginRight: '20px' }}>Question: </span>
-            <InputText 
-              value={currentWord?.vietnamese}
-              disabled
+          <div className='practice_input-container'>
+            <span>Question</span>
+            <Chip
+              label={currentWord?.vietnamese}
+              className="question_chip"
             />
           </div>
-          <InputText
-            value={userAnswer}
-            onChange={(e) => setUserAnswer(e.target.value)}
-            placeholder="Type your answer"
-            className="answer-input"
-          />
-          <Button onClick={handleAnswer}>Submit</Button>
-          <Button 
-            text 
-            onClick={handleCancel}
-            style={{ marginLeft: '10px' }}
-          >Cancel</Button>
-        </div>
-      )}
-
-      {isPractice && (
-        <div style={{marginTop: '20px'}}>
-          <h2 style={{paddingBottom: '10px'}}>Practice Complete!</h2>
-          <p style={{paddingBottom: '5px'}}>Correct: {score.correct}</p>
-          <p>Wrong: {score.wrong}</p>
+          <div className='practice_input-container'>
+            <span>Answer</span>
+            <InputText
+              ref={answerRef}
+              value={userAnswer}
+              onChange={(e) => setUserAnswer(e.target.value)}
+              placeholder="Type your answer"
+              style={{marginBottom: '0px'}}
+            />
+          </div>
+          <div className="formtest_btn">
+            <Button 
+              text 
+              onClick={handleCancel}
+              style={{ marginLeft: 'auto' }}
+            >Cancel</Button>
+            <Button onClick={handleAnswer}>Submit</Button>
+          </div>
         </div>
       )}
     </div>
