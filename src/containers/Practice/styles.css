@@ -55,13 +55,13 @@
   color: #acacac;
 }
 
-.anticon-check-circle svg {
+.result-dialog .anticon-check-circle svg {
   fill: #00d400;
   height: 26px;
   width: 26px;
 }
 
-.anticon-close-circle svg {
+.result-dialog .anticon-close-circle svg {
   fill: #ff0000;
   height: 26px;
   width: 26px;
